@@ -7,7 +7,7 @@ define('URL_USER_HISTORY_PAGE', 'http://shogiwars.heroz.jp/users/history/' . REP
 
 require_once('./lib/simple_html_dom.php');
 
-var_dump(get_game_urls('elzup'));
+echo implode(',', get_game_urls('elzup'));
 
 /**
  * プレイヤー名から,そのプレイヤーへのリンクリストを取得する
