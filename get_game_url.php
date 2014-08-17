@@ -7,6 +7,8 @@ define('URL_USER_HISTORY_PAGE', 'http://shogiwars.heroz.jp/users/history/' . REP
 
 require_once('./lib/simple_html_dom.php');
 
+var_dump(get_game_urls('elzup'));
+
 /**
  * プレイヤー名から,そのプレイヤーへのリンクリストを取得する
  *
@@ -18,7 +20,10 @@ function get_game_urls($player_name, $max = 100) {
     $urls = array();
     for ($i = 1; $i < $max; $i += GAME_PAR_PAGE) {
         $call_url = str_replace([REPLACE_NUM, REPLACE_PLAYER], [$i, $player_name], URL_USER_HISTORY_PAGE);
-        $html = file_get_html($call_url);
+        $html = @file_get_html($call_url);
+        if (empty($html)) {
+            throw new Exception('ユーザ名が正しくない可能性があります');
+        }
         $divs = $html->find('.short_btn1');
         if (!$divs) {
             break;
