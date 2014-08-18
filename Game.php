@@ -49,6 +49,7 @@ class Game {
         }
         $this->_install_player_level($html);
         $this->_install_record($html);
+        $this->_grading();
     }
 
     /**
@@ -92,7 +93,7 @@ class Game {
     /**
      * 段位文字列を数値化する
      */
-    public static function _levelstr_to_num($str) {
+    private static function _levelstr_to_num($str) {
         if (preg_match("#(?<n>\d+)級#u", $str, $m)) {
             return 31 - $m['n'];
         }
@@ -106,10 +107,38 @@ class Game {
     /**
      * それぞれの手(棋譜)に評価をつける
      */
-    public function grading()
+    private function _grading()
     {
         // プレイヤーのレベルと勝敗から評価する
+        //HandLevelPoint
+        $hlp = [
+            HAND_BLACK => Game::level_to_point($this->black_level),
+            HAND_WHITE => Game::level_to_point($this->white_level),
+        ];
+        $all_move_num = count($this->record);
+        foreach ($this->record as $t => &$move) {
+            if ($this->win == HAND_DRAW || $move->hand == $this->win) {
+                // 勝者の手または引き分け
+                $move->point = $hlp[$move->hand];
+            } else {
+                $process = 1 - ($t / $all_move_num);
+                $move->point = floor($hlp[$move->hand] * $process);
+            }
+        }
         
+    }
+
+    public static function level_to_point($level) {
+        // 10級以上は 10pt
+        // 1級以上は 20px
+        // 初段以上は 段位 * 10pt + 30pt
+        if ($level <= 20) {
+            return 10;
+        }
+        if ($level <= 30) {
+            return 20;
+        }
+        return ($level - 30) * 10 + 30;
     }
 
 }
@@ -121,12 +150,14 @@ class Move {
     public $animal;
     public $time;
 
+    public $point;
+
     public static $ANIMAL_STR = [
-            ANIMAL_KING     => ['らいおん', 'ら', '王', 'KING'],
-            ANIMAL_CHICK    => ['ひよこ', 'ひ', '歩', 'CHICK'],
-            ANIMAL_GIRAFFE  => ['きりん', 'き', '飛', 'GIRAFFE'],
-            ANIMAL_ELEPHANT => ['ぞう', 'ぞ', '角', 'ELEPHANT'],
-            ANIMAL_CHICKEN  => ['にわとり', 'に', '金', 'CHICKEN'],
+            ANIMAL_KING     => ['らいおん' , 'ら' , '王' , 'KING']     , 
+            ANIMAL_CHICK    => ['ひよこ'   , 'ひ' , '歩' , 'CHICK']    , 
+            ANIMAL_GIRAFFE  => ['きりん'   , 'き' , '飛' , 'GIRAFFE']  , 
+            ANIMAL_ELEPHANT => ['ぞう'     , 'ぞ' , '角' , 'ELEPHANT'] , 
+            ANIMAL_CHICKEN  => ['にわとり' , 'に' , '金' , 'CHICKEN']  , 
         ];
 
 
