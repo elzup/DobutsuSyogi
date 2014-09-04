@@ -5,11 +5,12 @@ require_once(dirname(__FILE__) . "/lib/simple_html_dom.php");
 define('HAND_BLACK', 0);
 define('HAND_WHITE', 1);
 define('HAND_DRAW', 2);
-define('ANIMAL_KING', 0);
-define('ANIMAL_CHICK', 1);
-define('ANIMAL_GIRAFFE', 2);
-define('ANIMAL_ELEPHANT', 3);
-define('ANIMAL_CHICKEN', 4);
+define('ANIMAL_NONE', 0);
+define('ANIMAL_KING', 1);
+define('ANIMAL_CHICK', 2);
+define('ANIMAL_GIRAFFE', 3);
+define('ANIMAL_ELEPHANT', 4);
+define('ANIMAL_CHICKEN', 5);
 
 define('TYPE_ASTR_FULL', 0);
 define('TYPE_ASTR_CHAR', 1);
@@ -128,6 +129,15 @@ class Game {
         
     }
 
+    public static function generate_maps() {
+        $math = [
+            [-ANIMAL_GIRAFFE, -ANIMAL_KING, -ANIMAL_ELEPHANT],
+            [ANIMAL_NONE, -ANIMAL_CHICK, ANIMAL_NONE],
+            [ANIMAL_NONE, ANIMAL_CHICK, ANIMAL_NONE],
+            [ANIMAL_ELEPHANT, ANIMAL_KING, -ANIMAL_GIRAFFE],
+        ];
+    }
+
     public static function level_to_point($level) {
         // 10級以上は 10pt
         // 1級以上は 20px
@@ -141,6 +151,20 @@ class Game {
         return ($level - 30) * 10 + 30;
     }
 
+}
+
+class Map {
+    public $hand;
+    public $math;
+    public $black_holds;
+    public $while_holds;
+    
+    public function __construct($math) {
+        $this->math = $math;
+    }
+
+    public function move() {
+    }
 }
 
 class Move {
