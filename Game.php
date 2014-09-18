@@ -129,6 +129,14 @@ class Game {
         
     }
 
+    public function print_game() {
+        $move_texts = array();
+        foreach ($this->record as $move) {
+            $move_texts[] = $move;
+        }
+        return implode(',', $move_texts);
+    }
+
     public static function generate_maps() {
         $math = [
             [-ANIMAL_GIRAFFE, -ANIMAL_KING, -ANIMAL_ELEPHANT],
@@ -136,6 +144,10 @@ class Game {
             [ANIMAL_NONE, ANIMAL_CHICK, ANIMAL_NONE],
             [ANIMAL_ELEPHANT, ANIMAL_KING, -ANIMAL_GIRAFFE],
         ];
+    }
+
+    public function print_map($map)
+    {
     }
 
     public static function level_to_point($level) {
@@ -195,6 +207,10 @@ class Move {
         $lib = ['OU' => ANIMAL_KING, 'FU' => ANIMAL_CHICK, 'HI' => ANIMAL_GIRAFFE, 'KA' => ANIMAL_ELEPHANT, 'TO' => ANIMAL_CHICKEN];
         $this->animal = $lib[$m['animal']];
         $this->time = $m['time'];
+    }
+
+    public function __tostring() {
+        return "{$this->from}:{$this->to}:{$this->point}";
     }
 
     /**
