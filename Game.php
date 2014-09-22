@@ -12,6 +12,8 @@ define('ANIMAL_GIRAFFE', 3);
 define('ANIMAL_ELEPHANT', 4);
 define('ANIMAL_CHICKEN', 5);
 
+define('HAND_SHIFT', 4);
+
 define('TYPE_ASTR_FULL', 0);
 define('TYPE_ASTR_CHAR', 1);
 define('TYPE_ASTR_KANJI', 2);
@@ -131,10 +133,28 @@ class Game {
 
     public function print_game() {
         $move_texts = array();
+        $map = Game::generate_maps();
         foreach ($this->record as $move) {
-            $move_texts[] = $move;
+            if ($move->from != 0) {
+                if ($a = $map[$move->get_to_y()][$move->get_to_x()]) {
+                    $map[$move->hand + 10] = $a;
+                }
+                $map[$move->get_to_y()][$move->get_to_x()] = $move->animal;
+                $map[$move->get_from_y()][$move->get_from_x()] = ANIMAL_NONE;
+            } else {
+                $map[$move->get_to_y()][$move->get_to_x()] = $move->animal;
+            }
+            echo Game::print_map($map);
+            echo '[';
+            echo Game::map_to_str($map);
+            echo " {$move->from}";
+            echo " {$move->to}";
+            echo " {$move->point}pt";
+            echo ']';
+            echo PHP_EOL;
+            echo PHP_EOL;
         }
-        return implode(',', $move_texts);
+        return;
     }
 
     public static function generate_maps() {
@@ -144,10 +164,36 @@ class Game {
             [ANIMAL_NONE, ANIMAL_CHICK, ANIMAL_NONE],
             [ANIMAL_ELEPHANT, ANIMAL_KING, -ANIMAL_GIRAFFE],
         ];
+        return $math;
     }
 
-    public function print_map($map)
-    {
+    public static function print_map($map) {
+        foreach ($map as $k => $mapl) {
+            if ($k > 3) {
+                break;
+            }
+            foreach ($mapl as $math) {
+                echo Move::to_animal_str($math);
+            }
+            echo PHP_EOL;
+        }
+        echo PHP_EOL;
+    }
+
+    public static function map_to_str($map) {
+        $str = '';
+        foreach ($map as $k => $mapl) {
+            if ($k > 3) {
+                break;
+            }
+            foreach ($mapl as $math) {
+                if ($math < 0) {
+                    $math = abs($math) + HAND_SHIFT;
+                }
+                $str .= $math;
+            }
+        }
+        return $str;
     }
 
     public static function level_to_point($level) {
@@ -170,7 +216,7 @@ class Map {
     public $math;
     public $black_holds;
     public $while_holds;
-    
+
     public function __construct($math) {
         $this->math = $math;
     }
@@ -189,11 +235,12 @@ class Move {
     public $point;
 
     public static $ANIMAL_STR = [
-            ANIMAL_KING     => ['らいおん' , 'ら' , '王' , 'KING']     , 
-            ANIMAL_CHICK    => ['ひよこ'   , 'ひ' , '歩' , 'CHICK']    , 
-            ANIMAL_GIRAFFE  => ['きりん'   , 'き' , '飛' , 'GIRAFFE']  , 
-            ANIMAL_ELEPHANT => ['ぞう'     , 'ぞ' , '角' , 'ELEPHANT'] , 
-            ANIMAL_CHICKEN  => ['にわとり' , 'に' , '金' , 'CHICKEN']  , 
+            ANIMAL_NONE     => ['空白'     , '　' , '　' , 'EMP']      ,
+            ANIMAL_KING     => ['らいおん' , 'ら' , '王' , 'KING']     ,
+            ANIMAL_CHICK    => ['ひよこ'   , 'ひ' , '歩' , 'CHICK']    ,
+            ANIMAL_GIRAFFE  => ['きりん'   , 'き' , '飛' , 'GIRAFFE']  ,
+            ANIMAL_ELEPHANT => ['ぞう'     , 'ぞ' , '角' , 'ELEPHANT'] ,
+            ANIMAL_CHICKEN  => ['にわとり' , 'に' , '金' , 'CHICKEN']  ,
         ];
 
 
@@ -222,6 +269,22 @@ class Move {
         return $this->get_animal_str(TYPE_ASTR_KANJI);
     }
 
+    public function get_from_x() {
+        return substr($this->from, 0, 1) - 1;
+    }
+
+    public function get_from_y() {
+        return substr($this->from, 1, 1) - 1;
+    }
+
+    public function get_to_x() {
+        return substr($this->to, 0, 1) - 1;
+    }
+
+    public function get_to_y() {
+        return substr($this->to, 1, 1) - 1;
+    }
+
     /**
      * 動物の文字列を返します
      * @var $type 文字のタイプ
@@ -234,6 +297,11 @@ class Move {
      */
     public function get_animal_str($type = TYPE_ASTR_CHAR)
     {
-        return Move::$ANIMAL_STR[$this->animal][$type];
+        return Move::$ANIMAL_STR[abs($this->animal)][$type];
+    }
+
+    public static function to_animal_str($animal_code, $type = TYPE_ASTR_CHAR)
+    {
+        return Move::$ANIMAL_STR[abs($animal_code)][$type];
     }
 }
