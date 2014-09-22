@@ -13,6 +13,9 @@ define('ANIMAL_ELEPHANT', 4);
 define('ANIMAL_CHICKEN', 5);
 
 define('HAND_SHIFT', 4);
+define('MAP_SHIFT', 4);
+
+define('MAP_SPLIT', 9);
 
 define('TYPE_ASTR_FULL', 0);
 define('TYPE_ASTR_CHAR', 1);
@@ -131,30 +134,31 @@ class Game {
         
     }
 
-    public function print_game() {
-        $move_texts = array();
+    public function dump_moves() {
         $map = Game::generate_maps();
-        foreach ($this->record as $move) {
+        $moves = $this->record;
+        foreach ($moves as &$move) {
             if ($move->from != 0) {
-                if ($a = $map[$move->get_to_y()][$move->get_to_x()]) {
-                    $map[$move->hand + 10] = $a;
+                if (ANIMAL_NONE != ($a = $map[$move->get_to_y()][$move->get_to_x()])) {
+                    $map[$move->hand + MAP_SHIFT][] = abs($a);
+                    sort($map[$move->hand + MAP_SHIFT]);
                 }
                 $map[$move->get_to_y()][$move->get_to_x()] = $move->animal;
                 $map[$move->get_from_y()][$move->get_from_x()] = ANIMAL_NONE;
             } else {
-                $map[$move->get_to_y()][$move->get_to_x()] = $move->animal;
+                $map[$move->get_to_y()][$move->get_to_x()] = ($move->hand == HAND_BLACK ? 1 : -1) *$move->animal;
+                foreach ($map[$move->hand + MAP_SHIFT] as $k => $h) {
+                    if ($h == $move->animal) {
+                        unset($map[$move->hand + MAP_SHIFT][$k]);
+                        sort($map[$move->hand + MAP_SHIFT]);
+                        break;
+                    }
+                }
+                $move->from = '9' . $move->animal;
             }
-            echo Game::print_map($map);
-            echo '[';
-            echo Game::map_to_str($map);
-            echo " {$move->from}";
-            echo " {$move->to}";
-            echo " {$move->point}pt";
-            echo ']';
-            echo PHP_EOL;
-            echo PHP_EOL;
+            $move->map = Game::map_to_str($map);
         }
-        return;
+        return $moves;
     }
 
     public static function generate_maps() {
@@ -163,6 +167,8 @@ class Game {
             [ANIMAL_NONE, -ANIMAL_CHICK, ANIMAL_NONE],
             [ANIMAL_NONE, ANIMAL_CHICK, ANIMAL_NONE],
             [ANIMAL_ELEPHANT, ANIMAL_KING, -ANIMAL_GIRAFFE],
+            HAND_BLACK + MAP_SHIFT => [],
+            HAND_WHITE + MAP_SHIFT => [],
         ];
         return $math;
     }
@@ -184,7 +190,7 @@ class Game {
         $str = '';
         foreach ($map as $k => $mapl) {
             if ($k > 3) {
-                break;
+                $str .= MAP_SPLIT;
             }
             foreach ($mapl as $math) {
                 if ($math < 0) {
@@ -231,6 +237,8 @@ class Move {
     public $to;
     public $animal;
     public $time;
+
+    public $map;
 
     public $point;
 
