@@ -138,6 +138,8 @@ class Game {
         $map = Game::generate_maps();
         $moves = $this->record;
         foreach ($moves as &$move) {
+            $move->map = Game::map_to_str($map);
+            Map::print_map($map);
             if ($move->from != 0) {
                 if (ANIMAL_NONE != ($a = $map[$move->get_to_y()][$move->get_to_x()])) {
                     $map[$move->hand + MAP_SHIFT][] = abs($a);
@@ -156,7 +158,6 @@ class Game {
                 }
                 $move->from = '9' . $move->animal;
             }
-            $move->map = Game::map_to_str($map);
         }
         return $moves;
     }
@@ -179,7 +180,7 @@ class Game {
                 break;
             }
             foreach ($mapl as $math) {
-                echo Move::to_animal_str($math);
+                echo Move::to_animal_str_f($math);
             }
             echo PHP_EOL;
         }
@@ -200,6 +201,18 @@ class Game {
             }
         }
         return $str;
+    }
+
+    public static function str_to_map($str) {
+        $params = preg_split('#' . MAP_SPLIT . '#', $str);
+        $map = array();
+        foreach (str_split($params[0], 3) as $l) {
+            $map[] = str_split($l);
+//            $map[] = str_replace(array(5, 6, 7, 8), array(-1, -2, -3, -4), str_split($l));
+        }
+        $map[HAND_BLACK + HAND_SHIFT] = $params[1];
+        $map[HAND_WHITE + HAND_SHIFT] = $params[2];
+        return $map;
     }
 
     public static function level_to_point($level) {
@@ -243,16 +256,19 @@ class Move {
     public $point;
 
     public static $ANIMAL_STR = [
-            ANIMAL_NONE     => ['空白'     , '　' , '　' , 'EMP']      ,
-            ANIMAL_KING     => ['らいおん' , 'ら' , '王' , 'KING']     ,
-            ANIMAL_CHICK    => ['ひよこ'   , 'ひ' , '歩' , 'CHICK']    ,
-            ANIMAL_GIRAFFE  => ['きりん'   , 'き' , '飛' , 'GIRAFFE']  ,
-            ANIMAL_ELEPHANT => ['ぞう'     , 'ぞ' , '角' , 'ELEPHANT'] ,
-            ANIMAL_CHICKEN  => ['にわとり' , 'に' , '金' , 'CHICKEN']  ,
+            ANIMAL_NONE     => ['空白'     , '　' , '　' , 'n']      ,
+            ANIMAL_KING     => ['らいおん' , 'ら' , '王' , 'k']     ,
+            ANIMAL_CHICK    => ['ひよこ'   , 'ひ' , '歩' , 'c']    ,
+            ANIMAL_GIRAFFE  => ['きりん'   , 'き' , '飛' , 'g']  ,
+            ANIMAL_ELEPHANT => ['ぞう'     , 'ぞ' , '角' , 'e'] ,
+            ANIMAL_CHICKEN  => ['にわとり' , 'に' , '金' , 'h']  ,
         ];
 
 
-    public function __construct($code) {
+    public function __construct($code = NULL) {
+        if (!$code) {
+            return;
+        }
         if (!preg_match("#(?P<hand>[+-])(?<from>\d{2})(?<to>\d{2})(?<animal>.{2}),L(?<time>\d+)#", $code, $m)) {
             throw new Exception("コードのフォーマットが正しくないです");
         }
@@ -312,4 +328,10 @@ class Move {
     {
         return Move::$ANIMAL_STR[abs($animal_code)][$type];
     }
+
+    public static function to_animal_str_f($animal_code, $type = TYPE_ASTR_CHAR)
+    {
+        return Move::$ANIMAL_STR[abs($animal_code)][$type] . ($animal_code > 0) ? '_' : 'X';
+    }
+
 }

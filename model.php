@@ -84,7 +84,7 @@ class Dobutushogi_model {
     }
 
     public function select_id_map($map) {
-        $sql = 'select * from ds_map where `map_info` =  :MAP_INFO';
+        $sql = 'select * from ds_map where `map_info` = :MAP_INFO';
         $stmt = $this->dbh->prepare($sql);
         $params = array(
             ':MAP_INFO' => $map,
@@ -96,5 +96,24 @@ class Dobutushogi_model {
             return FALSE;
         }
     }
+
+    public function select_moves($map) {
+        $sql = 'select * from ds_move where (`map_id`) in (select `map_id` from ds_map where `map_info` = :MAP_INFO)';
+        $stmt = $this->dbh->prepare($sql);
+        $params = array(
+            ':MAP_INFO' => $map,
+        );
+        $stmt->execute($params);
+        $moves = array();
+        while($res = $stmt->fetch()) {
+            $move = new Move();
+            $move->to = $res['move_to'];
+            $move->from = $res['move_from'];
+            $move->point = $res['point'];
+            $moves[] = $move;
+        }
+        return $moves;
+    }
+
 }
 
