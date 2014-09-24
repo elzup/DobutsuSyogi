@@ -159,6 +159,16 @@ class Game {
         return $moves;
     }
 
+    public static function map_flip($map) {
+        $map_t = $map;
+        for ($j = 0; $j < 4; $j++) {
+            for ($i = 0; $i < 3; $i++) {
+                $map[$j][$i] = $map_t[3 - $j][2 - $i];
+            }
+        }
+        return $map;
+    }
+
     public static function animal_code_to_flip($code) {
         return $code > HAND_SHIFT ? HAND_SHIFT - $code : $code;
     }
@@ -355,6 +365,10 @@ class Move {
     public static function to_animal_str_f($animal_code, $type = TYPE_ASTR_CHAR)
     {
         return Move::$ANIMAL_STR[abs($animal_code)][$type] .( ($animal_code == 0) ? '_' : ($animal_code > 0 ? 'O' : 'X'));
+    }
+
+    public function get_str() {
+        return $this->from . ' -> ' . $this->to;
     }
 
 }
