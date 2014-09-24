@@ -2,12 +2,8 @@
 define('REPLACE_NUM', '{NUM}');
 define('REPLACE_PLAYER', '{PLAYER}');
 define('GAME_PAR_PAGE', 10);
-define('URL_USER_HISTORY_PAGE', 'http://shogiwars.heroz.jp/a/events/zou2' . REPLACE_PLAYER . '?gtype=a&start=' . REPLACE_NUM);
-// http://shogiwars.heroz.jp/users/history/elzup?gtype=a&start=1
-
-require_once(dirname(__FILE__) . "/../lib/simple_html_dom.php");
-
-echo implode(',', get_game_urls('elzup'));
+define('URL_USER_HISTORY_PAGE', 'http://shogiwars.heroz.jp/users/history/' . REPLACE_PLAYER . '?gtype=a&start=' . REPLACE_NUM);
+require_once(dirname(__FILE__) . "/lib/simple_html_dom.php");
 
 /**
  * プレイヤー名から,そのプレイヤーへのリンクリストを取得する

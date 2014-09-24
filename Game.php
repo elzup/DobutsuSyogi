@@ -139,27 +139,50 @@ class Game {
         $moves = $this->record;
         foreach ($moves as &$move) {
             $move->map = Game::map_to_str($map);
-            Map::print_map($map);
-            if ($move->from != 0) {
-                if (ANIMAL_NONE != ($a = $map[$move->get_to_y()][$move->get_to_x()])) {
-                    $map[$move->hand + MAP_SHIFT][] = abs($a);
-                    sort($map[$move->hand + MAP_SHIFT]);
-                }
-                $map[$move->get_to_y()][$move->get_to_x()] = $move->animal;
-                $map[$move->get_from_y()][$move->get_from_x()] = ANIMAL_NONE;
-            } else {
-                $map[$move->get_to_y()][$move->get_to_x()] = ($move->hand == HAND_BLACK ? 1 : -1) *$move->animal;
-                foreach ($map[$move->hand + MAP_SHIFT] as $k => $h) {
-                    if ($h == $move->animal) {
-                        unset($map[$move->hand + MAP_SHIFT][$k]);
-                        sort($map[$move->hand + MAP_SHIFT]);
-                        break;
-                    }
-                }
-                $move->from = '9' . $move->animal;
-            }
+//            Game::print_map($map);
+//            echo Game::map_to_str($map);
+            $map = Game::next_map($map, $move);
         }
         return $moves;
+    }
+
+    public static function install_moves($moves, $map, $hand) {
+        foreach($moves as &$move) {
+            if (strpos($move->from, "9") !== FALSE) {
+                $move->from = 0;
+                $move->animal = substr($move->from, 1, 1);
+            } else {
+                $move->animal = abs($map[$move->get_from_y()][$move->get_from_x()]);
+            }
+            $move->hand = $hand;
+        }
+        return $moves;
+    }
+
+    public static function animal_code_to_flip($code) {
+        return $code > HAND_SHIFT ? HAND_SHIFT - $code : $code;
+    }
+
+    public static function next_map($map, Move &$move) {
+        if ($move->from != 0) {
+            if (ANIMAL_NONE != ($a = $map[$move->get_to_y()][$move->get_to_x()])) {
+                $map[$move->hand + MAP_SHIFT][] = abs(Game::animal_code_to_flip($a));
+                sort($map[$move->hand + MAP_SHIFT]);
+            }
+            $map[$move->get_to_y()][$move->get_to_x()] = $map[$move->get_from_y()][$move->get_from_x()];
+            $map[$move->get_from_y()][$move->get_from_x()] = ANIMAL_NONE;
+        } else {
+            $map[$move->get_to_y()][$move->get_to_x()] = ($move->hand == HAND_BLACK ? 1 : -1) * $move->animal;
+            foreach ($map[$move->hand + MAP_SHIFT] as $k => $h) {
+                if ($h == $move->animal) {
+                    unset($map[$move->hand + MAP_SHIFT][$k]);
+                    sort($map[$move->hand + MAP_SHIFT]);
+                    break;
+                }
+            }
+            $move->from = '9' . $move->animal;
+        }
+        return $map;
     }
 
     public static function generate_maps() {
@@ -167,7 +190,7 @@ class Game {
             [-ANIMAL_GIRAFFE, -ANIMAL_KING, -ANIMAL_ELEPHANT],
             [ANIMAL_NONE, -ANIMAL_CHICK, ANIMAL_NONE],
             [ANIMAL_NONE, ANIMAL_CHICK, ANIMAL_NONE],
-            [ANIMAL_ELEPHANT, ANIMAL_KING, -ANIMAL_GIRAFFE],
+            [ANIMAL_ELEPHANT, ANIMAL_KING, ANIMAL_GIRAFFE],
             HAND_BLACK + MAP_SHIFT => [],
             HAND_WHITE + MAP_SHIFT => [],
         ];
@@ -210,8 +233,8 @@ class Game {
             $map[] = str_split($l);
 //            $map[] = str_replace(array(5, 6, 7, 8), array(-1, -2, -3, -4), str_split($l));
         }
-        $map[HAND_BLACK + HAND_SHIFT] = $params[1];
-        $map[HAND_WHITE + HAND_SHIFT] = $params[2];
+        $map[HAND_BLACK + HAND_SHIFT] = str_split($params[1]);
+        $map[HAND_WHITE + HAND_SHIFT] = str_split($params[2]);
         return $map;
     }
 
@@ -331,7 +354,7 @@ class Move {
 
     public static function to_animal_str_f($animal_code, $type = TYPE_ASTR_CHAR)
     {
-        return Move::$ANIMAL_STR[abs($animal_code)][$type] . ($animal_code > 0) ? '_' : 'X';
+        return Move::$ANIMAL_STR[abs($animal_code)][$type] .( ($animal_code == 0) ? '_' : ($animal_code > 0 ? 'O' : 'X'));
     }
 
 }

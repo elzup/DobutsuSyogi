@@ -2,6 +2,7 @@
 require_once('./Game.php');
 require_once("./model.php");
 require_once('./keys.php');
+define('BASE_URL', 'http://localhost/dobutsu_syogi/');
 
 try{
     $dm = new Dobutushogi_model(new PDO(DB_DSN, DB_USER, DB_PASS));
@@ -10,16 +11,19 @@ try{
     die();
 }
 
-$map_str = @$_GET['m'] ?: '010340032410992:0';
+$map_str = @$_GET['m'] ?: '75806002041399:0';
 list($map_str, $hand) = explode(':', $map_str);
 $map = Game::str_to_map($map_str);
 $moves = $dm->select_moves($map_str);
+$moves = Game::install_moves($moves, $map, $hand);
 
-function print_map_table($map, $move = NULL) {
+function print_map_table($map, $hand = 1, Move $move = NULL) {
     if (!$move) {
         echo '<span>元盤面</span>';
     } else {
         echo '<span>' . $move->point . 'pt</span>';
+        $map = Game::next_map($map, $move);
+        echo '<a href="' . BASE_URL . '?m=' . Game::map_to_str($map) . ':' . (1 ^ $hand) . '">選択</a>';
     }
     echo '<table>';
     for ($j = 0; $j < 4; $j++) {
@@ -97,6 +101,7 @@ function print_map_table($map, $move = NULL) {
 }
 </style>
 
+    <a href="<?= BASE_URL ?>">最初から</a>
 <?php 
 print_map_table($map);
 
@@ -104,9 +109,8 @@ echo '<span>候補</span>';
 echo '<div class="list">';
 foreach ($moves as $m) {
     echo '<div class="item">';
-    print_map_table($map, $m);
+    print_map_table($map, $hand, $m);
     echo '</div>';
 }
 echo '</div>';
 
-?>

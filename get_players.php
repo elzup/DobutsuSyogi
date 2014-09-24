@@ -1,9 +1,11 @@
 <?php
-define('REPLACE_NUM', '{NUM}');
+if (!defined('REPLACE_NUM')) {
+    define('REPLACE_NUM', '{NUM}');
+}
 define('PERSON_PAR_PAGE', 25);
 define('URL_CONFERENCE', 'http://shogiwars.heroz.jp/a/events/hiyoko2?rank_criteria=max_rating&start=' . REPLACE_NUM . '&user=byeordie');
 
-require_once(dirname(__FILE__) . "/../lib/simple_html_dom.php");
+require_once(dirname(__FILE__) . "/lib/simple_html_dom.php");
 
 //echo implode(',', $names);
 /**
