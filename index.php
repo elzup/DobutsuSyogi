@@ -17,8 +17,8 @@ $flip_url = get_flip_url($flip);
 
 list($map_str, $hand) = explode(':', $map_str);
 $map = Game::str_to_map($map_str);
-$moves = $dm->select_moves($map_str);
-$moves = Game::install_moves($moves, $map, $hand);
+$moves = $dm->select_moves($map_str, $hand);
+$moves = Game::install_moves($moves, $map);
 foreach ($moves as $move) {
     echo $move->get_str();
     echo ',';
@@ -38,12 +38,11 @@ function get_flip_url($flip) {
 function print_map_table($map, $hand = 1, Move $move = NULL) {
     global $flip;
     $hand_head = '◯' . ($hand ? '★' : '');
-    $hand_foot = '●' . (!$hand ? '★' : '');
+    $hand_foot = (!$hand ? '★' : '') . '●';
     if (!$move) {
         echo '<span>元盤面</span>';
     } else {
         echo '<span>' . $move->point . 'pt</span>';
-        var_dump($move);
         $map = Game::next_map($map, $move);
         echo '<a href="' . BASE_URL . '?m=' . Game::map_to_str($map) . ':' . (1 ^ $hand) . '">選択</a>';
         $move_str = $move->get_str();
@@ -85,61 +84,7 @@ function print_map_table($map, $hand = 1, Move $move = NULL) {
 
 
 <meta charset="utf-8" />
-<style type="text/css">
-.math {
-    width: 50px;
-    height: 50px;
-    border: black solid 2px;
-    text-align: center;
-    border-radius: 1em 1em 0 0;
-    font-weight: bold;
-}
-.hand-3 {
-    border: solid gray 1px;
-    border-radius: 0;
-}
-
-.hand-0 {
-    background: blue;
-}
-
-.hand-1 {
-    background: green;
-    transform: rotateX(180deg);
-}
-
-.animal-k {
-    background: #ffcccc;
-    color: orange;
-}
-.animal-c {
-    background: #ffffaa;
-}
-.animal-g {
-    background: #dbd;
-    color: yellow;
-}
-.animal-e {
-    background: #dbd;
-    color: gray;
-}
-.animal-h {
-    background: #ffffaa;
-}
-
-.list {
-    overflow: auto;
-}
-.list > div {
-    float: left;
-}
-.flip {
-    transform: rotate(180deg);
-}
-.flip .a-char {
-    transform: rotateY(180deg);
-}
-</style>
+<link rel="stylesheet" href="./style/main.css">
 
 <p>
     <a href="<?= BASE_URL ?>">最初から</a>

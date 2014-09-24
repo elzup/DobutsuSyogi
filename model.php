@@ -97,11 +97,12 @@ class Dobutushogi_model {
         }
     }
 
-    public function select_moves($map) {
-        $sql = 'select * from ds_move where (`map_id`) in (select `map_id` from ds_map where `map_info` = :MAP_INFO)';
+    public function select_moves($map, $move_hand) {
+        $sql = 'select * from ds_move where (`map_id`) in (select `map_id` from ds_map where `map_info` = :MAP_INFO) and `move_hand` = :MOVE_HAND';
         $stmt = $this->dbh->prepare($sql);
         $params = array(
             ':MAP_INFO' => $map,
+            ':MOVE_HAND' => $move_hand,
         );
         $stmt->execute($params);
         $moves = array();
@@ -110,6 +111,7 @@ class Dobutushogi_model {
             $move->to = $res['move_to'];
             $move->from = $res['move_from'];
             $move->point = $res['point'];
+            $move->hand = $move_hand;
             $moves[] = $move;
         }
         return $moves;

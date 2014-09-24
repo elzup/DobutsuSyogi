@@ -146,15 +146,14 @@ class Game {
         return $moves;
     }
 
-    public static function install_moves($moves, $map, $hand) {
+    public static function install_moves($moves, $map) {
         foreach($moves as &$move) {
             if (strpos($move->from, "9") !== FALSE) {
-                $move->from = 0;
                 $move->animal = substr($move->from, 1, 1);
+                $move->from = 0;
             } else {
-                $move->animal = abs($map[$move->get_from_y()][$move->get_from_x()]);
+                $move->animal = GAME::animal_code_to_positive($map[$move->get_from_y()][$move->get_from_x()]);
             }
-            $move->hand = $hand;
         }
         return $moves;
     }
@@ -167,6 +166,10 @@ class Game {
             }
         }
         return $map;
+    }
+
+    public static function animal_code_to_positive($code) {
+        return $code < 0 ? -$code + HAND_SHIFT : $code;
     }
 
     public static function animal_code_to_flip($code) {
@@ -182,7 +185,7 @@ class Game {
             $map[$move->get_to_y()][$move->get_to_x()] = $map[$move->get_from_y()][$move->get_from_x()];
             $map[$move->get_from_y()][$move->get_from_x()] = ANIMAL_NONE;
         } else {
-            $map[$move->get_to_y()][$move->get_to_x()] = ($move->hand == HAND_BLACK ? 1 : -1) * $move->animal;
+            $map[$move->get_to_y()][$move->get_to_x()] = ($move->hand == HAND_BLACK ? 0 : 4) + $move->animal;
             foreach ($map[$move->hand + MAP_SHIFT] as $k => $h) {
                 if ($h == $move->animal) {
                     unset($map[$move->hand + MAP_SHIFT][$k]);
@@ -227,10 +230,7 @@ class Game {
                 $str .= MAP_SPLIT;
             }
             foreach ($mapl as $math) {
-                if ($math < 0) {
-                    $math = abs($math) + HAND_SHIFT;
-                }
-                $str .= $math;
+                $str .= GAME::animal_code_to_positive($math);
             }
         }
         return $str;
@@ -289,12 +289,12 @@ class Move {
     public $point;
 
     public static $ANIMAL_STR = [
-            ANIMAL_NONE     => ['空白'     , '　' , '　' , 'n']      ,
-            ANIMAL_KING     => ['らいおん' , 'ら' , '王' , 'k']     ,
-            ANIMAL_CHICK    => ['ひよこ'   , 'ひ' , '歩' , 'c']    ,
-            ANIMAL_GIRAFFE  => ['きりん'   , 'き' , '飛' , 'g']  ,
-            ANIMAL_ELEPHANT => ['ぞう'     , 'ぞ' , '角' , 'e'] ,
-            ANIMAL_CHICKEN  => ['にわとり' , 'に' , '金' , 'h']  ,
+            ANIMAL_NONE     => ['空白'     , '　' , '　' , 'n'],
+            ANIMAL_KING     => ['らいおん' , 'ら' , '王' , 'k'],
+            ANIMAL_CHICK    => ['ひよこ'   , 'ひ' , '歩' , 'c'],
+            ANIMAL_GIRAFFE  => ['きりん'   , 'き' , '飛' , 'g'],
+            ANIMAL_ELEPHANT => ['ぞう'     , 'ぞ' , '角' , 'e'],
+            ANIMAL_CHICKEN  => ['にわとり' , 'に' , '金' , 'h'],
         ];
 
 
