@@ -4,7 +4,7 @@ require_once("./model.php");
 require_once('./keys.php');
 define('BASE_URL', 'http://localhost/dobutsu_syogi/');
 
-try{
+try {
     $dm = new Dobutushogi_model(new PDO(DB_DSN, DB_USER, DB_PASS));
 } catch (PDOException $e){
     print('Error:'.$e->getMessage());
