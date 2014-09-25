@@ -19,10 +19,10 @@ list($map_str, $hand) = explode(':', $map_str);
 $map = Game::str_to_map($map_str);
 $moves = $dm->select_moves($map_str, $hand);
 $moves = Game::install_moves($moves, $map);
-foreach ($moves as $move) {
-    echo $move->get_str();
-    echo ',';
+function cmp_point(Move $a, Move $b) {
+    return $a->point == $b->point ? 0 : ($a->point < $b->point) ? 1 : -1;
 }
+usort($moves, "cmp_point");
 
 function get_flip_url($flip) {
     preg_match('#(?<base>.*[&?]f=)(.*)#', $_SERVER["REQUEST_URI"], $m);
@@ -35,19 +35,21 @@ function get_flip_url($flip) {
     return $url;
 }
 
-function print_map_table($map, $hand = 1, Move $move = NULL) {
-    global $flip;
+function print_map_table($map, $hand = 1, $flip = 0, Move $move = NULL) {
     $hand_head = '◯' . ($hand ? '★' : '');
     $hand_foot = (!$hand ? '★' : '') . '●';
+    $class = '';
     if (!$move) {
         echo '<span>元盤面</span>';
+        $class .= ' main';
     } else {
         echo '<span>' . $move->point . 'pt</span>';
         $map = Game::next_map($map, $move);
-        echo '<a href="' . BASE_URL . '?m=' . Game::map_to_str($map) . ':' . (1 ^ $hand) . '">選択</a>';
+        echo '<a class="select" href="' . BASE_URL . '?m=' . Game::map_to_str($map) . ':' . (1 ^ $hand) . '&f="' . $flip . '>';
         $move_str = $move->get_str();
+        $class .= ' sub';
     }
-    $class = $flip ? 'flip' : '';
+    $class .= $flip ? ' flip' : '';
     echo '<table class="' . $class .'">';
 
     if (!$move) {
@@ -71,13 +73,16 @@ function print_map_table($map, $hand = 1, Move $move = NULL) {
         }
         echo '</tr>' . PHP_EOL;
     }
-    echo '<tr><td colspan="3">' . Game::map_to_str($map) . '</td></tr>';
+//    echo '<tr><td colspan="3">' . Game::map_to_str($map) . '</td></tr>';
     if (!$move) {
         echo '<tr><td colspan="2"></td><td>' . $hand_foot . '</td></td>';
     } else {
-        echo '<tr><td colspan="3">' . $move_str . '</td></tr>';
+//        echo '<tr><td colspan="3">' . $move_str . '</td></tr>';
     }
     echo '</table>';
+    if ($move) {
+        echo '</a>';
+    }
 }
 
 ?>
@@ -85,20 +90,24 @@ function print_map_table($map, $hand = 1, Move $move = NULL) {
 
 <meta charset="utf-8" />
 <link rel="stylesheet" href="./style/main.css">
-
+<title>どうぶつしょうぎ解析</title>
+<h1>どうぶつしょうぎ解析</h1><span>v1.0</span>
 <p>
     <a href="<?= BASE_URL ?>">最初から</a>
     <a href="<?= $flip_url ?>">反転</a>
 </p>
 <?php 
-print_map_table($map, $hand);
+print_map_table($map, $hand, $flip);
 
 echo '<span>候補</span>';
 echo '<div class="list">';
 foreach ($moves as $m) {
     echo '<div class="item">';
-    print_map_table($map, $hand, $m);
+    print_map_table($map, $hand, $flip, $m);
     echo '</div>';
 }
 echo '</div>';
 
+?>
+
+<a class="pull-right" href="//elzup.com">elzup.com</a>

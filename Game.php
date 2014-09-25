@@ -141,6 +141,8 @@ class Game {
             $move->map = Game::map_to_str($map);
 //            Game::print_map($map);
 //            echo Game::map_to_str($map);
+//            echo PHP_EOL;
+//            echo PHP_EOL;
             $map = Game::next_map($map, $move);
         }
         return $moves;
@@ -359,12 +361,14 @@ class Move {
 
     public static function to_animal_str($animal_code, $type = TYPE_ASTR_CHAR)
     {
+        $animal_code = GAME::animal_code_to_flip($animal_code);
         return Move::$ANIMAL_STR[abs($animal_code)][$type];
     }
 
     public static function to_animal_str_f($animal_code, $type = TYPE_ASTR_CHAR)
     {
-        return Move::$ANIMAL_STR[abs($animal_code)][$type] .( ($animal_code == 0) ? '_' : ($animal_code > 0 ? 'O' : 'X'));
+        $animal_code = GAME::animal_code_to_flip($animal_code);
+        return Move::$ANIMAL_STR[abs($animal_code)][$type] . (($animal_code == 0) ? '_' : ($animal_code > 0 ? 'O' : 'X'));
     }
 
     public function get_str() {
