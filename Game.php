@@ -178,14 +178,19 @@ class Game {
         return $code > HAND_SHIFT ? HAND_SHIFT - $code : $code;
     }
 
-    public static function next_map($map, Move &$move) {
+    public static function next_map($map, Move &$move, $is_visible = FALSE) {
         if ($move->from != 0) {
             if (ANIMAL_NONE != ($a = $map[$move->get_to_y()][$move->get_to_x()])) {
                 $map[$move->hand + MAP_SHIFT][] = abs(Game::animal_code_to_flip($a));
                 sort($map[$move->hand + MAP_SHIFT]);
             }
             $map[$move->get_to_y()][$move->get_to_x()] = $map[$move->get_from_y()][$move->get_from_x()];
-            $map[$move->get_from_y()][$move->get_from_x()] = ANIMAL_NONE;
+            if ($is_visible) {
+                // 元のマスを点線表示に
+                $map[$move->get_from_y()][$move->get_from_x()] = ANIMAL_NONE;
+            } else {
+                $map[$move->get_from_y()][$move->get_from_x()] = ANIMAL_NONE;
+            }
         } else {
             $map[$move->get_to_y()][$move->get_to_x()] = ($move->hand == HAND_BLACK ? 0 : 4) + $move->animal;
             foreach ($map[$move->hand + MAP_SHIFT] as $k => $h) {
