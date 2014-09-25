@@ -1,46 +1,58 @@
 .math {
     width: 50px;
     height: 50px;
+
+    &.hand-0 {
+    }
+
+    &.hand-1 {
+        transform: rotateX(180deg);
+    }
+
+    &.hand-2, &.hand-3 {
+        border: solid gray 1px;
+        border-radius: 0;
+        &.from {
+            border-radius: 15px 15px 0 0;
+            border: dotted;
+        }
+    } 
+
+    &.hand-3.from {
+        transform: rotateX(180deg);
+    }
+
+    &.animal-k {
+        .piece(#fcc, orange);
+    }
+    &.animal-c {
+        .piece(#ffa, black);
+    }
+    &.animal-g {
+        .piece(#dbd, yellow);
+    }
+    &.animal-e {
+        .piece(#dbd, gray);
+    }
+    &.animal-h {
+        .piece(#ffa, black);
+    }
+
+    &.from,&.to {
+        border-color: red !important;
+    }
+}
+
+.piece(@bg_color, @font-color) {
+    background: @bg_color;
+    color: @font-color;
     border: black solid 2px;
     text-align: center;
     border-radius: 15px 15px 0 0;
     font-weight: bold;
     font-size: 22px;
 }
-.hand-3 {
-    border: solid gray 1px;
-    border-radius: 0;
-}
 
-.hand-0 {
-    background: blue;
-}
-
-.hand-1 {
-    background: green;
-    transform: rotateX(180deg);
-}
-
-.animal-k {
-    background: #ffcccc;
-    color: orange;
-}
-.animal-c {
-    background: #ffffaa;
-    color: black;
-}
-.animal-g {
-    background: #dbd;
-    color: yellow;
-}
-.animal-e {
-    background: #dbd;
-    color: gray;
-}
-.animal-h {
-    background: #ffffaa;
-    color: black;
-}
 .flip {
     transform: rotate(180deg);
     .a-char {
@@ -52,6 +64,7 @@
     .math {
         width: 70px;
         height: 70px;
+
     }
 }
 

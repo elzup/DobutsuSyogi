@@ -14,7 +14,7 @@ function get_flip_url($flip) {
     return $url;
 }
 
-function print_map_table($map, $hand = 1, $flip = 0, Move $move = NULL) {
+function print_map_table($map, $hand, $flip, Move $move) {
     $hand_head = '◯' . ($hand ? '★' : '');
     $hand_foot = (!$hand ? '★' : '') . '●';
     $class = '';
@@ -29,18 +29,32 @@ function print_map_table($map, $hand = 1, $flip = 0, Move $move = NULL) {
     for ($j = 0; $j < 4; $j++) {
         echo '<tr>';
         for ($i = 0; $i < 3; $i++) {
-            $hand = HAND_BLACK;
+            $math_hand = HAND_BLACK;
             $a = $map[$j][$i];
             if ($a > 4) {
-                $hand = HAND_WHITE;
+                $math_hand = HAND_WHITE;
                 $a = -($a - HAND_SHIFT);
             }
             if ($a == 0) {
-                $hand = 3;
+                $math_hand = $hand + 2;
             }
-            echo '<td colspan="2" class="math hand-' . $hand . ' animal-' . Move::to_animal_str($a, TYPE_ASTR_ENG) . '">';
-            echo '<div class="a-char">' . Move::to_animal_str($a) . '</div>';
-            echo '</td>';
+            $td_classes = array(
+                'math',
+                'hand-' . $math_hand,
+                'animal-' . Move::to_animal_str($a, TYPE_ASTR_ENG)
+            );
+            if ($move->from - 11 == ($i . $j)) {
+                $td_classes[] = 'from';
+            }
+            if ($move->to - 11 == ($i . $j)) {
+                $td_classes[] = 'to';
+            }
+            $td_class = implode(' ', $td_classes);
+?>
+            <td colspan="2" class="<?= $td_class ?>">
+            <div class="a-char"><?= Move::to_animal_str($a) ?></div>
+            </td>
+<?php
         }
         echo '</tr>';
     }
@@ -67,18 +81,26 @@ function print_map_table_main ($map, $hand, $flip, array $moves) {
     for ($j = 0; $j < 4; $j++) {
         echo '<tr>';
         for ($i = 0; $i < 3; $i++) {
-            $hand = HAND_BLACK;
+            $math_hand = HAND_BLACK;
             $a = $map[$j][$i];
             if ($a > 4) {
-                $hand = HAND_WHITE;
+                $math_hand= HAND_WHITE;
                 $a = -($a - HAND_SHIFT);
             }
             if ($a == 0) {
-                $hand = 3;
+                $math_hand = $hand + 2;
             }
-            echo '<td colsapn="2" class="math hand-' . $hand . ' animal-' . Move::to_animal_str($a, TYPE_ASTR_ENG) . '">';
-            echo '<div class="a-char">' . Move::to_animal_str($a) . '</div>';
-            echo '</td>' . PHP_EOL;
+            $td_classes = array(
+                'math',
+                'hand-' . $math_hand,
+                'animal-' . Move::to_animal_str($a, TYPE_ASTR_ENG)
+            );
+            $td_class = implode(' ', $td_classes);
+?>
+            <td colspan="2" class="<?= $td_class ?>">
+            <div class="a-char"><?= Move::to_animal_str($a) ?></div>
+            </td>
+<?php
         }
         echo '</tr>' . PHP_EOL;
     }
