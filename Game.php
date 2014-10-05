@@ -88,7 +88,7 @@ class Game {
         $record = array();
         $codes = explode("\t", $text);
         $last_code = array_pop($codes);
-        $lib = ['S' => HAND_BLACK, 'G' => HAND_WHITE, 'D' => HAND_DRAW];
+        $lib = array('S' => HAND_BLACK, 'G' => HAND_WHITE, 'D' => HAND_DRAW);
         $this->win = $lib[substr($last_code, 0, 1)];
         foreach ($codes as $code) {
             $record[] = new Move($code);
@@ -106,7 +106,7 @@ class Game {
         preg_match("#(?<n>.)段#u", $str, $m);
         // 段位以上だった場合
         $char = $m['n'];
-        $lib = ['初' => 1, '二' => 2, '三' => 3, '四' => 4, '五' => 5, '六' => 6, '七' => 7, '八' => 8, '九' => 9, '十'=> 10];
+        $lib = array('初' => 1, '二' => 2, '三' => 3, '四' => 4, '五' => 5, '六' => 6, '七' => 7, '八' => 8, '九' => 9, '十'=> 10);
         return 31 + $lib[$char];
     }
 
@@ -117,10 +117,10 @@ class Game {
     {
         // プレイヤーのレベルと勝敗から評価する
         //HandLevelPoint
-        $hlp = [
+        $hlp = array( 
             HAND_BLACK => Game::level_to_point($this->black_level),
             HAND_WHITE => Game::level_to_point($this->white_level),
-        ];
+        );
         $all_move_num = count($this->record);
         foreach ($this->record as $t => &$move) {
             if ($this->win == HAND_DRAW || $move->hand == $this->win) {
@@ -206,14 +206,14 @@ class Game {
     }
 
     public static function generate_maps() {
-        $math = [
-            [-ANIMAL_GIRAFFE, -ANIMAL_KING, -ANIMAL_ELEPHANT],
-            [ANIMAL_NONE, -ANIMAL_CHICK, ANIMAL_NONE],
-            [ANIMAL_NONE, ANIMAL_CHICK, ANIMAL_NONE],
-            [ANIMAL_ELEPHANT, ANIMAL_KING, ANIMAL_GIRAFFE],
-            HAND_BLACK + MAP_SHIFT => [],
-            HAND_WHITE + MAP_SHIFT => [],
-        ];
+        $math = array(
+            array(-ANIMAL_GIRAFFE, -ANIMAL_KING, -ANIMAL_ELEPHANT),
+            array(ANIMAL_NONE, -ANIMAL_CHICK, ANIMAL_NONE),
+            array(ANIMAL_NONE, ANIMAL_CHICK, ANIMAL_NONE),
+            array(ANIMAL_ELEPHANT, ANIMAL_KING, ANIMAL_GIRAFFE),
+            HAND_BLACK + MAP_SHIFT => array(),
+            HAND_WHITE + MAP_SHIFT => array(),
+        );
         return $math;
     }
 
@@ -295,14 +295,14 @@ class Move {
 
     public $point;
 
-    public static $ANIMAL_STR = [
-            ANIMAL_NONE     => ['空白'     , '　' , '　' , 'n'],
-            ANIMAL_KING     => ['らいおん' , 'ら' , '王' , 'k'],
-            ANIMAL_CHICK    => ['ひよこ'   , 'ひ' , '歩' , 'c'],
-            ANIMAL_GIRAFFE  => ['きりん'   , 'き' , '飛' , 'g'],
-            ANIMAL_ELEPHANT => ['ぞう'     , 'ぞ' , '角' , 'e'],
-            ANIMAL_CHICKEN  => ['にわとり' , 'に' , '金' , 'h'],
-        ];
+    public static $ANIMAL_STR = array(
+            ANIMAL_NONE     => array('空白'     , '　' , '　' , 'n'),
+            ANIMAL_KING     => array('らいおん' , 'ら' , '王' , 'k'),
+            ANIMAL_CHICK    => array('ひよこ'   , 'ひ' , '歩' , 'c'),
+            ANIMAL_GIRAFFE  => array('きりん'   , 'き' , '飛' , 'g'),
+            ANIMAL_ELEPHANT => array('ぞう'     , 'ぞ' , '角' , 'e'),
+            ANIMAL_CHICKEN  => array('にわとり' , 'に' , '金' , 'h'),
+        );
 
 
     public function __construct($code = NULL) {
@@ -315,7 +315,7 @@ class Move {
         $this->hand = ($m['hand'] == '+') ? HAND_BLACK : HAND_WHITE;
         $this->from = $m['from'];
         $this->to = $m['to'];
-        $lib = ['OU' => ANIMAL_KING, 'FU' => ANIMAL_CHICK, 'HI' => ANIMAL_GIRAFFE, 'KA' => ANIMAL_ELEPHANT, 'TO' => ANIMAL_CHICKEN];
+        $lib = array('OU' => ANIMAL_KING, 'FU' => ANIMAL_CHICK, 'HI' => ANIMAL_GIRAFFE, 'KA' => ANIMAL_ELEPHANT, 'TO' => ANIMAL_CHICKEN);
         $this->animal = $lib[$m['animal']];
         $this->time = $m['time'];
     }

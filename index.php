@@ -1,9 +1,12 @@
 <?php
+
+ini_set('display_errors', '1');
+error_reporting(E_ALL);
+
 require_once('./Game.php');
 require_once("./model.php");
 require_once('./keys.php');
 require_once('./funcs.php');
-define('BASE_URL', 'http://localhost/dobutsu_syogi/');
 
 try {
     $dm = new Dobutushogi_model(new PDO(DB_DSN, DB_USER, DB_PASS));
